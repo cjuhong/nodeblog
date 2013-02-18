@@ -1,5 +1,4 @@
-define(['views/index', 'views/register', 'views/login', 'views/forgotpassword'], 
-	function(IndexView, RegisterView, LoginView, ForgotPasswordView) {
+define(['views/index', 'views/register', 'views/login', 'views/forgotpassword'], function(IndexView, RegisterView, LoginView, ForgotPasswordView) {
 	var SocialRouter = Backbone.Router.extend({
 		currentView: null,
 		routes: {
@@ -9,7 +8,7 @@ define(['views/index', 'views/register', 'views/login', 'views/forgotpassword'],
 			"forgotpassword": "forgotpassword"
 		},
 		changeView: function(view) {
-			if(null != this.currentView){
+			if(null != this.currentView) {
 				this.currentView.undelegateEvents();
 			}
 			this.currentView = view;
