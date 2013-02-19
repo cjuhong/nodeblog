@@ -7,6 +7,13 @@ var express = require('express'),
   user = require('./routes/user'),
   http = require('http'),
   path = require('path');
+var nodemailer = require('nodemailer');
+var MemoryStore = require('connect').session.MemoryStore;
+var mongoose = require('mongoose');
+var config = {
+  mail: require('./config/mail')
+};
+var Account = require('./models/Account')(config, mongoose, nodemailer);
 
 var app = express();
 
@@ -18,9 +25,17 @@ app.configure(function() {
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+  app.use(express.cookieParser());
+  app.use(express.session({
+    secret: "SocialNet secret key",
+    store: new MemoryStore()
+  }));
+  mongoose.connect('mongodb://localhost/nodebackbone');
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
+  app.use(express.limit('1mb'));
 });
+
 
 app.configure('development', function() {
   app.use(express.errorHandler());
@@ -84,6 +99,25 @@ app.post('/forgotpassword', function(req, res) {
       res.send(404);
     }
   });
+});
+
+app.get('/resetPassword', function(req, res) {
+  var accountId = req.param('account', null);
+  res.render('resetPassword.jade', {
+    locals: {
+      accountId: accountId
+    }
+  });
+});
+
+
+app.post('/resetPassword', function(req, res) {
+  var accountId = req.param('accountId', null);
+  var password = req.param('password', null);
+  if(null != accountId && null != password) {
+    Account.changePassword(accountId, password);
+  }
+  res.render('resetPasswordSuccess.jade');
 });
 
 http.createServer(app).listen(app.get('port'), function() {
