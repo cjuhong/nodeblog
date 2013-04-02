@@ -6,7 +6,7 @@ require.config({
     text: '/js/libs/text',
     templates: '../templates'
   },
-shim: {
+  shim: {
     'Backbone': ['Underscore', 'jQuery'],
     'SocialNet': ['Backbone']
   }
