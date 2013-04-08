@@ -13,8 +13,10 @@ var mongoose = require('mongoose');
 var config = {
   mail: require('./config/mail')
 };
-var Account = require('./models/Account')(config, mongoose, nodemailer);
-
+// var Account = require('./models/Account')(config, mongoose, nodemailer);
+var models = {
+  Account: require('./models/Account')(config, mongoose, nodemailer)
+};
 var app = express();
 
 app.configure(function() {
@@ -65,16 +67,39 @@ app.post('/register', function(req, res) {
   res.send(200);
 });
 
+// app.post('/login', function(req, res) {
+//   console.log('login request');
+//   var email = req.param('email', null);
+//   var password = req.param('password', null);
+//   if(null == email || email.length < 1 || null == password || password.length < 1) {
+//     res.send(400);
+//     return;
+//   }
+//   Account.login(email, password, function(success) {
+//     if(!success) {
+//       res.send(401);
+//       return;
+//     }
+//     console.log('login was successful');
+//     req.session.loggedIn = true;
+//     req.session.accountId = account._id;
+//     res.send(200);
+//   });
+// });
+
 app.post('/login', function(req, res) {
   console.log('login request');
   var email = req.param('email', null);
   var password = req.param('password', null);
-  if(null == email || email.length < 1 || null == password || password.length < 1) {
+
+  if ( null == email || email.length < 1
+      || null == password || password.length < 1 ) {
     res.send(400);
     return;
   }
-  Account.login(email, password, function(success) {
-    if(!success) {
+
+  models.Account.login(email, password, function(account) {
+    if ( !account ) {
       res.send(401);
       return;
     }
