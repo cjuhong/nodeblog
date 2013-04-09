@@ -149,10 +149,16 @@ app.post('/resetPassword', function(req, res) {
 
 
 app.get('/accounts/:id', function(req, res) {
-  var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
-  models.Account.findOne({
-    _id: accountId
-  }, function(account) {
+  // var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
+  // models.Account.findById({
+  //   _id: accountId
+  // }, function(account) {
+  //   res.send(account);
+  //   console.log(account);
+  //   console.log({id: accountId});
+  // });
+var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
+  models.Account.findById(accountId, function(account) {
     res.send(account);
   });
 });
