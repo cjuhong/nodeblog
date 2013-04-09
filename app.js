@@ -63,7 +63,7 @@ app.post('/register', function(req, res) {
     res.send(400);
     return;
   }
-  Account.register(email, password, firstName, lastName);
+  models.Account.register(email, password, firstName, lastName);
   res.send(200);
 });
 
@@ -142,7 +142,7 @@ app.post('/resetPassword', function(req, res) {
   var accountId = req.param('accountId', null);
   var password = req.param('password', null);
   if(null != accountId && null != password) {
-    Account.changePassword(accountId, password);
+    models.Account.changePassword(accountId, password);
   }
   res.render('resetPasswordSuccess.jade');
 });
@@ -150,7 +150,7 @@ app.post('/resetPassword', function(req, res) {
 
 app.get('/accounts/:id', function(req, res) {
   var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
-  Account.findOne({
+  models.Account.findOne({
     _id: accountId
   }, function(account) {
     res.send(account);
