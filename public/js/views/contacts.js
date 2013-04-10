@@ -8,9 +8,12 @@ function(SocialNetView, ContactView, contactsTemplate) {
 		},
 		render: function() {
 			this.$el.html(contactsTemplate);
+			// console.log(this.collection);
 		},
 		renderCollection: function(collection) {
-			collection.each(function(contact) {
+			// console.log(collection);
+			// collection.each(function(contact) {
+			_.each(collection,function(contact) {
 				var statusHtml = (new ContactView({
 					removeButton: true,
 					model: contact
