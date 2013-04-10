@@ -10,6 +10,7 @@ var express = require('express'),
 var nodemailer = require('nodemailer');
 var MemoryStore = require('connect').session.MemoryStore;
 var mongoose = require('mongoose');
+var dbPath = 'mongodb://localhost/nodebackbone';
 var config = {
   mail: require('./config/mail')
 };
@@ -32,7 +33,10 @@ app.configure(function() {
     secret: "SocialNet secret key",
     store: new MemoryStore()
   }));
-  mongoose.connect('mongodb://localhost/nodebackbone');
+  // mongoose.connect('mongodb://localhost/nodebackbone');
+  mongoose.connect(dbPath, function onMongooseError(err) {
+    if (err) throw err;
+  });
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(express.limit('1mb'));
@@ -148,21 +152,6 @@ app.post('/resetPassword', function(req, res) {
 });
 
 
-app.get('/accounts/:id', function(req, res) {
-  // var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
-  // models.Account.findById({
-  //   _id: accountId
-  // }, function(account) {
-  //   res.send(account);
-  //   console.log(account);
-  //   console.log({id: accountId});
-  // });
-var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
-  models.Account.findById(accountId, function(account) {
-    res.send(account);
-  });
-});
-
 app.get('/accounts/:id/status', function(req, res) {
   var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
   models.Account.findById(accountId, function(account) {
@@ -193,6 +182,84 @@ app.get('/accounts/:id/activity', function(req, res) {
   var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
   models.Account.findById(accountId, function(account) {
     res.send(account.activity);
+  });
+});
+
+
+app.get('/accounts/:id/contacts', function(req, res) {
+  var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
+  models.Account.findById(accountId, function(account) {
+    res.send(account.contacts);
+  });
+});
+
+app.post('/contacts/find', function(req, res) {
+  var searchStr = req.param('searchStr', null);
+  if (null == searchStr) {
+    res.send(400);
+    return;
+  }
+  models.Account.findByString(searchStr, function onSearchDone(err, accounts) {
+    if (err || accounts.length == 0) {
+      res.send(404);
+    } else {
+      res.send(accounts);
+    }
+  });
+});
+
+app.post('/accounts/:id/contact', function(req, res) {
+  var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
+  var contactId = req.param('contactId', null);
+  // Missing contactId, don't bother going any further
+  if (null == contactId) {
+    res.send(400);
+    return;
+  }
+  models.Account.findById(accountId, function(account) {
+    if (account) {
+      models.Account.findById(contactId, function(contact) {
+        models.Account.addContact(account, contact);
+        // Make the reverse link
+        models.Account.addContact(contact, account);
+        account.save();
+      });
+    }
+  });
+  // Note: Not in callback - this endpoint returns immediately and
+  // processes in the background
+  res.send(200);
+});
+
+app.delete('/accounts/:id/contact', function(req, res) {
+  var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
+  var contactId = req.param('contactId', null);
+  // Missing contactId, don't bother going any further
+  if (null == contactId) {
+    res.send(400);
+    return;
+  }
+  models.Account.findById(accountId, function(account) {
+    if (!account) return;
+    models.Account.findById(contactId, function(contact, err) {
+      if (!contact) return;
+      models.Account.removeContact(account, contactId);
+      // Kill the reverse link
+      models.Account.removeContact(contact, accountId);
+    });
+  });
+  // Note: Not in callback - this endpoint returns immediately and
+  // processes in the background
+  res.send(200);
+});
+
+app.get('/accounts/:id', function(req, res) {
+  var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
+  models.Account.findById(accountId, function(account) {
+    if (accountId == 'me' || models.Account.hasContact(account, req.session.accountId)) {
+      account.isFriend = true;
+    }
+    res.send(account);
   });
 });
 
