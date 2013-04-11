@@ -10,14 +10,12 @@ function(SocialNetView, contactTemplate) {
 			"click .removebutton": "removeContact"
 		},
 		addContact: function() {
-			var $responseArea = this.$('.actionArea');
+			var $responseArea = this.$('.actionarea');
 			$.post('/accounts/me/contact', {
 				contactId: this.model.get('_id')
-			},
-
-			function onSuccess() {
+			}).done(function onSuccess() {
 				$responseArea.text('Contact Added');
-			}, function onError() {
+			}).fail(function onError() {
 				$responseArea.text('Could not add contact');
 			});
 		},

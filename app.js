@@ -107,6 +107,7 @@ app.post('/login', function(req, res) {
       res.send(401);
       return;
     }
+    console.log(account.name.first);
     console.log('login was successful');
     req.session.loggedIn = true;
     req.session.accountId = account._id;
@@ -163,7 +164,10 @@ app.post('/accounts/:id/status', function(req, res) {
   var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
   models.Account.findById(accountId, function(account) {
     status = {
-      name: account.name,
+      name: {
+        first: account.name.first,
+        last: account.name.last
+      },
       status: req.param('status', '')
     };
     account.status.push(status);
