@@ -8,16 +8,14 @@ function(SocialNetView, ContactView, contactsTemplate) {
 		},
 		render: function() {
 			this.$el.html(contactsTemplate);
-			// console.log(this.collection);
 		},
 		renderCollection: function(collection) {
-			// console.log(collection);
-			// collection.each(function(contact) {
-			_.each(collection,function(contact) {
+			collection.each(function(contact) {
 				var statusHtml = (new ContactView({
 					removeButton: true,
 					model: contact
 				})).render().el;
+				// console.log(statusHtml);
 				$(statusHtml).appendTo('.contacts_list');
 			});
 		}

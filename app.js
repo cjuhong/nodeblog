@@ -191,6 +191,7 @@ app.get('/accounts/:id/contacts', function(req, res) {
   models.Account.findById(accountId, function( account ) {
     res.send( account.contacts );
     // console.log( account.contacts );
+    // console.log(typeof account.contacts );
   });
 });
 
