@@ -34,7 +34,7 @@ statusTemplate, Status, StatusView) {
     render: function() {
       var that = this;
       this.$el.html(
-      _.template(profileTemplate, this.model.toJSON()));
+        _.template(profileTemplate, this.model.toJSON()));
       var statusCollection = this.model.get('status');
       if (null != statusCollection) {
         _.each(statusCollection, function(statusJson) {

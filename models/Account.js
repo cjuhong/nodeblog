@@ -187,11 +187,16 @@ module.exports = function(config, mongoose, Status, nodemailer) {
   };
   var hasContact = function(account, contactId) {
     if (null == account.contacts) return false;
-    account.contacts.forEach(function(contact) {
-      if (contact.accountId == contactId) {
+    // account.contacts.forEach(function(contact) {
+    //   if (contact.accountId == contactId) {
+    //     return true;
+    //   }
+    // });
+    for (var i = 0; i < account.contacts.length; i++) {
+      if( account.contacts[i].accountId == contactId) {
         return true;
       }
-    });
+    };
     return false;
   };
   var register = function(email, password, firstName, lastName) {
