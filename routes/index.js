@@ -2,7 +2,8 @@
 /*
  * GET home page.
  */
-
-exports.index = function(req, res){
-  res.render('index', { title: 'Social Network' });
+module.exports = function(app, models) {
 };
+// exports.index = function(req, res){
+//   res.render('index', { title: 'Social Network' });
+// };

@@ -8,6 +8,7 @@ ContactsView, AddContactView, Account, StatusCollection,
 ContactCollection) {
   var SocialRouter = Backbone.Router.extend({
     currentView: null,
+    socketEvents: _.extend({}, Backbone.Events),
     routes: {
       'addcontact': 'addcontact',
       'index': 'index',
@@ -36,7 +37,7 @@ ContactCollection) {
       this.changeView(new AddContactView());
     },
     login: function() {
-      this.changeView(new LoginView());
+      this.changeView(new LoginView({socketEvents : this.socketEvents}));
     },
     forgotpassword: function() {
       this.changeView(new ForgotPasswordView());
