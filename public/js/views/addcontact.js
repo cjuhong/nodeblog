@@ -9,6 +9,7 @@ function(SocialNetView, Contact, ContactView, addcontactTemplate) {
 		},
 		search: function() {
 			var view = this;
+			// console.log(this.$('form').serialize());
 			$.post('/contacts/find',
 			this.$('form').serialize(), function(data) {
 				view.render(data);
