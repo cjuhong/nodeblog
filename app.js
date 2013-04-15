@@ -22,6 +22,8 @@ var models = {
 var app = express();
 app.sessionStore = new MemoryStore();
 
+app.server = http.createServer(app);
+
 
 app.configure(function() {
   app.set('port', process.env.PORT || 3000);
@@ -78,6 +80,6 @@ app.post('/contacts/find', function(req, res) {
   });
 });
 
-http.createServer(app).listen(app.get('port'), function() {
+app.server.listen(app.get('port'), function() {
   console.log("Express server listening on port " + app.get('port'));
 });
