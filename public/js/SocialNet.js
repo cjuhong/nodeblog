@@ -1,11 +1,13 @@
-define(['router'], function(router) {
+define(['router','SocialNetSockets'], function(router, socket) {
   var initialize = function() {
+      socket.initialize(router.socketEvents);
       checkLogin(runApplication);
     };
   var checkLogin = function(callback) {
       $.ajax("/account/authenticated", {
         method: "GET",
         success: function() {
+          router.socketEvents.trigger('app:loggedin', data);
           return callback(true);
         },
         error: function(data) {

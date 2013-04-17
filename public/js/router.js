@@ -29,7 +29,8 @@ ContactCollection) {
       var statusCollection = new StatusCollection();
       statusCollection.url = '/accounts/me/activity';
       this.changeView(new IndexView({
-        collection: statusCollection
+        collection: statusCollection,
+        socketEvents:this.socketEvents
       }));
       statusCollection.fetch();
     },
@@ -50,7 +51,8 @@ ContactCollection) {
         id: id
       });
       this.changeView(new ProfileView({
-        model: model
+        model: model,
+        socketEvents:this.socketEvents
       }));
       model.fetch();
     },

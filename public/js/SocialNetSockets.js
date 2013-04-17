@@ -1,9 +1,11 @@
-define(['Sockets', 'models/contactcollection', 'views/chat'],
+define(['Sockets', 'models/ContactCollection', 'views/chat'],
 
 function(sio, ContactCollection, ChatView) {
 	var SocialNetSockets = function(eventDispatcher) {
 		var socket = null;
-		var connectSocket = function() {
+		var accountId = null;
+		var connectSocket = function(socketAccountId) {
+			accountId = socketAccountId;
 			socket = sio.connect();
 			socket.on('connect_failed', function(reason) {
 				console.error('unable to connect', reason);
@@ -16,6 +18,8 @@ function(sio, ContactCollection, ChatView) {
 					eventDispatcher.trigger('socket:chat:in:' + data.from, data);
 				});
 
+				socket.on('contactEvent', handleContactEvent);
+
 				var contactsCollection = new ContactCollection();
 				contactsCollection.url = '/accounts/me/contacts';
 
@@ -26,6 +30,15 @@ function(sio, ContactCollection, ChatView) {
 
 				contactsCollection.fetch();
 			});
+		};
+
+		var handleContactEvent = function(eventObj) {
+			var eventName = eventObj.action + ':' + eventObj.from;
+			eventDispatcher.trigger(eventName, eventObj);
+			if (eventObj.from == accountId) {
+				eventName = eventObj.action + ':me';
+				eventDispatcher.trigger(eventName, eventObj);
+			}
 		};
 
 		var sendChat = function(payload) {

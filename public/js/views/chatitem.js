@@ -8,18 +8,40 @@ function(SocialNetView, chatItemTemplate) {
 			'click': 'startChatSession',
 		},
 		initialize: function(options) {
+			var accountId = this.model.get('accountId');
 			options.socketEvents.bind(
-				'socket:chat:start:' + this.model.get('accountId'),
+				'login:' + accountId,
+			this.handleContactLogin,
+			this);
+			options.socketEvents.bind(
+				'logout:' + accountId,
+			this.handleContactLogout,
+			this);
+			options.socketEvents.bind(
+				'socket:chat:start:' + accountId,
 			this.startChatSession,
 			this);
 		},
 		startChatSession: function() {
 			this.trigger('chat:start', this.model);
 		},
+		handleContactLogin: function() {
+			this.model.set('online', true);
+			this.$el.find('.online_indicator').addClass('online');
+		},
+		handleContactLogout: function() {
+			this.model.set('online', false);
+			$onlineIndicator = this.$el.find('.online_indicator');
+			while ($onlineIndicator.hasClass('online')) {
+				$onlineIndicator.removeClass('online');
+			}
+		},
+
 		render: function() {
 			this.$el.html(_.template(chatItemTemplate, {
 				model: this.model.toJSON()
 			}));
+			if ( this.model.get('online') ) this.handleContactLogin();
 			return this;
 		}
 	});

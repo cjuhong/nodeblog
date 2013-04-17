@@ -27,7 +27,7 @@ module.exports = function(app, models) {
 			var accountId = session.accountId;
 			socket.join(accountId);
 			socket.on('chatclient', function(data) {
-				sio.sockets. in (data.to).emit('chatserver', {
+				sio.sockets.in(data.to).emit('chatserver', {
 					from: accountId,
 					text: data.text
 				});
