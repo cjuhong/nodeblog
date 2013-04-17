@@ -8,6 +8,7 @@ var express = require('express'),
   http = require('http'),
   path = require('path');
 var fs = require('fs');
+var events = require('events');
 var nodemailer = require('nodemailer');
 var MemoryStore = require('connect').session.MemoryStore;
 var mongoose = require('mongoose');
@@ -16,16 +17,18 @@ var config = {
   mail: require('./config/mail')
 };
 // var Account = require('./models/Account')(config, mongoose, nodemailer);
-var models = {
-  Account: require('./models/Account')(config, mongoose, nodemailer)
-};
 var app = express();
 app.sessionStore = new MemoryStore();
 
 app.server = http.createServer(app);
 
+var models = {
+  Account: require('./models/Account')(app, config, mongoose, nodemailer)
+};
+
 
 app.configure(function() {
+  app.sessionSecret = 'SocialNet secret key';
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
@@ -35,7 +38,7 @@ app.configure(function() {
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(express.session({
-    secret: "SocialNet secret key",
+    secret: app.sessionSecret,
     key: 'express.sid',
     store: app.sessionStore
   }));
@@ -48,6 +51,17 @@ app.configure(function() {
   app.use(express.limit('1mb'));
 });
 
+// Create an event dispatcher
+var eventDispatcher = new events.EventEmitter();
+app.addEventListener = function(eventName, callback) {
+  eventDispatcher.on(eventName, callback);
+};
+app.removeEventListener = function(eventName, callback) {
+  eventDispatcher.removeListener(eventName, callback);
+};
+app.triggerEvent = function(eventName, eventOptions) {
+  eventDispatcher.emit(eventName, eventOptions);
+};
 
 app.configure('development', function() {
   app.use(express.errorHandler());
@@ -64,6 +78,9 @@ fs.readdirSync('routes').forEach(function(file) {
   var routeName = file.substr(0, file.indexOf('.'));
   require('./routes/' + routeName)( app, models);
 });
+
+
+
 
 app.post('/contacts/find', function(req, res) {
   var searchStr = req.param('searchStr', null);

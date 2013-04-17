@@ -46,10 +46,6 @@ function(SocialNetView, indexTemplate, StatusView, Status) {
 			var statusCollection = this.collection;
 			$.post('/accounts/me/status', {
 				status: statusText
-			}, function(data) {
-				statusCollection.add(new Status({
-					status: statusText
-				}));
 			});
 			return false;
 		},

@@ -9,7 +9,8 @@ statusTemplate, Status, StatusView) {
     events: {
       "submit form": "postStatus"
     },
-    initialize: function() {
+    initialize: function(options) {
+      this.socketEvents = options.socketEvents;
       this.model.bind('change', this.render, this);
     },
     postStatus: function() {
@@ -25,6 +26,15 @@ statusTemplate, Status, StatusView) {
       });
       return false;
     },
+
+    onSocketStatusAdded: function(data) {
+      var newStatus = data.data;
+      this.prependStatus(new Status({
+        status: newStatus.status,
+        name: newStatus.name
+      }))
+    },
+
     prependStatus: function(statusModel) {
       var statusHtml = (new StatusView({
         model: statusModel
@@ -32,9 +42,13 @@ statusTemplate, Status, StatusView) {
       $(statusHtml).prependTo('.status_list').hide().fadeIn('slow');
     },
     render: function() {
+      if (this.model.get('_id')) {
+        this.socketEvents.bind('status:' + this.model.get('_id'),
+        this.onSocketStatusAdded, this);
+      }
       var that = this;
       this.$el.html(
-        _.template(profileTemplate, this.model.toJSON()));
+      _.template(profileTemplate, this.model.toJSON()));
       var statusCollection = this.model.get('status');
       if (null != statusCollection) {
         _.each(statusCollection, function(statusJson) {
