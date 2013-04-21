@@ -10,6 +10,7 @@ module.exports = function(app, models) {
 			return (clients.length > 0);
 		};
 		console.log("isAccountOnline is here");
+		debugger;
 		sio.set('authorization', function(data, accept) {
 			var signedCookies = cookie.parse(data.headers.cookie);
 			var cookies = utils.parseSignedCookies(signedCookies, app.sessionSecret);
@@ -25,6 +26,8 @@ module.exports = function(app, models) {
 			});
 		});
 		sio.sockets.on('connection', function(socket) {
+			console.log("connection in server side");
+			debugger;
 			var session = socket.handshake.session;
 			var accountId = session.accountId;
 			var sAccount = null;
@@ -67,7 +70,7 @@ module.exports = function(app, models) {
 				});
 			});
 			socket.on('chatclient', function(data) {
-				sio.sockets. in (data.to).emit('chatserver', {
+				sio.sockets.in(data.to).emit('chatserver', {
 					from: accountId,
 					text: data.text
 				});

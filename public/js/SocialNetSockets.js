@@ -10,7 +10,6 @@ function(sio, ContactCollection, ChatView) {
 			socket.on('connect_failed', function(reason) {
 				console.error('unable to connect', reason);
 			}).on('connect', function() {
-
 				eventDispatcher.bind('socket:chat', sendChat);
 
 				socket.on('chatserver', function(data) {
